@@ -1,0 +1,1728 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl" id="html-root">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>سجلات الشخصية الجانبية | Anime Side Character RPG (AdSense & Privacy Compliant)</title>
+  <meta name="description" content="عش مغامرتك التفاعلية كشخصية جانبية عبر الكتابة الحرة المطلقة مع محرك تحليل نصوص محلي متكامل، متوافق مع سياسات الخصوصية وإعلانات AdSense." />
+
+  <!-- Google Fonts: Cairo for Arabic & Rajdhani / Inter for English -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800;900&family=Rajdhani:wght@500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Cairo', 'sans-serif'],
+            display: ['Rajdhani', 'Cairo', 'sans-serif'],
+          },
+          colors: {
+            slate: {
+              750: '#1e293b',
+              850: '#0f172a',
+              925: '#060a12',
+              950: '#030712',
+            }
+          }
+        }
+      }
+    };
+  </script>
+
+  <!-- React 18, ReactDOM 18 & Babel Standalone for Direct Browser Execution Anywhere -->
+  <script src="https://unpkg.com/react@18/umd/react.production.min.js" crossorigin></script>
+  <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js" crossorigin></script>
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+
+  <style>
+    * {
+      box-sizing: border-box;
+      -webkit-tap-highlight-color: transparent;
+    }
+    body {
+      background-color: #030712;
+      color: #f1f5f9;
+      font-family: 'Cairo', sans-serif;
+      overflow-x: hidden;
+      width: 100%;
+      min-height: 100vh;
+    }
+    body.lang-en {
+      font-family: 'Rajdhani', 'Segoe UI', sans-serif;
+    }
+    ::-webkit-scrollbar {
+      width: 8px;
+      height: 8px;
+    }
+    ::-webkit-scrollbar-track {
+      background: #0b0f19;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #334155;
+      border-radius: 4px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: #475569;
+    }
+    @keyframes pulseGlow {
+      0%, 100% { opacity: 0.3; transform: scale(1); }
+      50% { opacity: 0.7; transform: scale(1.05); }
+    }
+    .pulse-glow {
+      animation: pulseGlow 4s infinite ease-in-out;
+    }
+  </style>
+</head>
+<body class="bg-slate-950 text-slate-100 antialiased selection:bg-rose-500 selection:text-white flex flex-col min-h-screen">
+  <div id="root" class="flex-1 flex flex-col"></div>
+
+  <!-- Complete Standalone Game Application Script (100% Offline Engine + Privacy & AdSense Ready) -->
+  <script type="text/babel">
+    const { useState, useEffect, useRef } = React;
+
+    // ========================================================
+    // 1. Web Audio API Sound Effects Synthesizer
+    // ========================================================
+    class SoundFX {
+      constructor() {
+        this.ctx = null;
+        this.enabled = true;
+      }
+      init() {
+        if (!this.ctx && (window.AudioContext || window.webkitAudioContext)) {
+          const AudioContext = window.AudioContext || window.webkitAudioContext;
+          this.ctx = new AudioContext();
+        }
+        if (this.ctx && this.ctx.state === 'suspended') {
+          this.ctx.resume();
+        }
+      }
+      playClick() {
+        if (!this.enabled) return;
+        this.init();
+        if (!this.ctx) return;
+        try {
+          const osc = this.ctx.createOscillator();
+          const gain = this.ctx.createGain();
+          osc.type = 'sine';
+          osc.frequency.setValueAtTime(440, this.ctx.currentTime);
+          osc.frequency.exponentialRampToValueAtTime(880, this.ctx.currentTime + 0.05);
+          gain.gain.setValueAtTime(0.08, this.ctx.currentTime);
+          gain.gain.exponentialRampToValueAtTime(0.001, this.ctx.currentTime + 0.05);
+          osc.connect(gain);
+          gain.connect(this.ctx.destination);
+          osc.start();
+          osc.stop(this.ctx.currentTime + 0.05);
+        } catch (e) {}
+      }
+      playSuccess() {
+        if (!this.enabled) return;
+        this.init();
+        if (!this.ctx) return;
+        try {
+          const now = this.ctx.currentTime;
+          [523.25, 659.25, 783.99, 1046.50].forEach((freq, i) => {
+            const osc = this.ctx.createOscillator();
+            const gain = this.ctx.createGain();
+            osc.type = 'triangle';
+            osc.frequency.setValueAtTime(freq, now + i * 0.08);
+            gain.gain.setValueAtTime(0.12, now + i * 0.08);
+            gain.gain.exponentialRampToValueAtTime(0.001, now + i * 0.08 + 0.25);
+            osc.connect(gain);
+            gain.connect(this.ctx.destination);
+            osc.start(now + i * 0.08);
+            osc.stop(now + i * 0.08 + 0.25);
+          });
+        } catch (e) {}
+      }
+      playPlotArmor() {
+        if (!this.enabled) return;
+        this.init();
+        if (!this.ctx) return;
+        try {
+          const now = this.ctx.currentTime;
+          const osc = this.ctx.createOscillator();
+          const gain = this.ctx.createGain();
+          osc.type = 'sawtooth';
+          osc.frequency.setValueAtTime(150, now);
+          osc.frequency.exponentialRampToValueAtTime(600, now + 0.35);
+          gain.gain.setValueAtTime(0.2, now);
+          gain.gain.exponentialRampToValueAtTime(0.001, now + 0.45);
+          osc.connect(gain);
+          gain.connect(this.ctx.destination);
+          osc.start(now);
+          osc.stop(now + 0.45);
+        } catch (e) {}
+      }
+      playDice() {
+        if (!this.enabled) return;
+        this.init();
+        if (!this.ctx) return;
+        try {
+          const now = this.ctx.currentTime;
+          for (let i = 0; i < 4; i++) {
+            const osc = this.ctx.createOscillator();
+            const gain = this.ctx.createGain();
+            osc.type = 'square';
+            osc.frequency.setValueAtTime(200 + Math.random() * 300, now + i * 0.06);
+            gain.gain.setValueAtTime(0.08, now + i * 0.06);
+            gain.gain.exponentialRampToValueAtTime(0.001, now + i * 0.06 + 0.04);
+            osc.connect(gain);
+            gain.connect(this.ctx.destination);
+            osc.start(now + i * 0.06);
+            osc.stop(now + i * 0.06 + 0.04);
+          }
+        } catch (e) {}
+      }
+    }
+    const sound = new SoundFX();
+
+    // ========================================================
+    // 2. Bilingual Translations Dictionary (Arabic & English)
+    // ========================================================
+    const TRANSLATIONS = {
+      ar: {
+        appTitle: 'سجلات الشخصية الجانبية',
+        appSubtitle: 'نظام السرد السينمائي التفاعلي بالكتابة الحرة ومحرك الذكاء المحلي (100% Offline)',
+        engineBadge: '⚡ محرك سرد محلي ذكي (100% Offline - بلا مفاتيح أو إنترنت)',
+        selectWorldTitle: 'اختر عالم الأنمي لبدء مغامرتك',
+        selectWorldSubtitle: 'عش القصة كشخصية جانبية تصنع الفارق في الكواليس، واكتب قراراتك بحرية تامة دون أي خيارات جاهزة',
+        characterCreateTitle: 'إنشاء هوية الشخصية الجانبية',
+        characterCreateSubtitle: 'حدد صفتك وسمتك وهدفك السري في الكواليس ليتكيف محرك التحليل مع أسلوبك الفريد',
+        roleLabel: 'دورك / وظيفتك في الكواليس',
+        rolePlaceholder: 'مثال: جندي حراسة مستودع المؤن، مسعف طوارئ، رسول نينجا، ميكانيكي...',
+        roleDefault: 'جندي حراسة في خطوط الدعم الخلفية',
+        traitLabel: 'سمتك التكتيكية البارزة',
+        traitPlaceholder: 'مثال: حذر شديد، ملاحظة حادة للثغرات، دهقان ميداني، هادئ تحت الضغط...',
+        traitDefault: 'حذر وملاحظ دقيق لحركات الأعداء',
+        goalLabel: 'هدفك السري الذي تسعى لتحقيقه',
+        goalPlaceholder: 'مثال: البقاء حياً والتقاعد بسلام، جمع ثروة سرية، إرسال المؤن لعائلتي...',
+        goalDefault: 'البقاء على قيد الحياة وتأمين طريق نجاة رفاقي',
+        btnStartStory: 'بدء المغامرة في الكواليس ⚔️',
+        btnBack: 'رجوع',
+        turnLabel: 'الفصل',
+        healthLabel: 'الصحة الحيوية',
+        levelLabel: 'المستوى',
+        xpLabel: 'الخبرة',
+        plotArmorTitle: 'درع الحبكة (Plot Armor)',
+        plotArmorActive: 'مفعل (يحميك من الموت المحتم)',
+        plotArmorExhausted: 'مستنفد! أي ضربة قاتلة ستنهي قصتك',
+        specialAbilitiesTitle: 'القدرات التكتيكية الميدانية',
+        abilityReady: 'جاهزة للتفعيل!',
+        useAbilityBtn: 'تفعيل القدرة ⚡',
+        diceRollTitle: 'نرد الحظ التكتيكي (D20)',
+        btnRollDice: 'رمي نرد الأقدار 🎲',
+        freeFormHeading: 'اكتب قرارك أو تصرفك التكتيكي القادم بحرية تامة:',
+        freeFormPlaceholder: 'اكتب تصرفك القادم بالتفصيل هنا... (مثال: أتسلل تحت الركام وأطلق قنبلة دخانية للتغطية على تراجع المسعفين، ثم أستولي على جهاز الاتصال اللاسلكي من جندي العدو الساقط وأبث إحداثيات مضللة...)',
+        freeFormCharCount: 'حرف',
+        btnSubmitDecision: 'إرسال القرار وصناعة القدر ✍️',
+        analyzingInput: 'جاري قراءة قرارك وتحليل نيتك وتوليد الفصل التالي...',
+        btnNewGame: 'مغامرة جديدة 🔄',
+        historyHeading: 'سجل الفصول والقرارات السابقة',
+        suggestionPrompt: 'أفكار سريعة للإلهام (انقر لإضافتها للنص):',
+        sug1: 'شن هجوم مباغت على نقطة الضعف غير المحمية',
+        sug2: 'التسلل في الظلال ومراقبة تحركات القادة',
+        sug3: 'استغلال البيئة وصنع فخ كهربائي ومحاصرة الممر',
+        sug4: 'التفاوض الدبلوماسي وخداع الخصم بحديث واثق',
+        sug5: 'مخاطرة مجنونة بتفجير مستودع الإمدادات للتمويه',
+        canonHeroLabel: 'أثر الفراشة على الأبطال:',
+        consequenceLabel: 'عواقب تصرفك المباشرة:',
+        detectedIntent: 'النية التكتيكية المكتشفة:',
+        intent_attack: '⚔️ هجوم واقتحام مباشر',
+        intent_stealth: '🕵️ تسلل واستطلاع صامت',
+        intent_environment: '⚙️ استغلال البيئة والأدوات',
+        intent_tactical: '🧠 مناورة تكتيكية ودبلوماسية وخداع',
+        intent_reckless: '🔥 رهان مجنون ومخاطرة يائسة',
+        intent_balanced: '⚖️ تصرف متوازن وحذر',
+        // Compliance & Ads
+        adPlaceholderHeader: 'مساحة إعلانية علوية (Leaderboard 728x90 / Responsive)',
+        adPlaceholderFooter: 'مساحة إعلانية سفلية (Banner Responsive 728x90)',
+        adNotice: 'إعلان معتمد • Sponsored Ad',
+        cookieText: 'نستخدم ملفات تعريف الارتباط (Cookies) والتخزين المحلي لحفظ تقدم اللعبة وتحسين تجربة التصفح وعرض إعلانات مخصصة وفق سياسات Google AdSense.',
+        cookieAccept: 'موافقة ومتابعة اللعب ✔️',
+        cookieLearnMore: 'سياسة الخصوصية',
+        footerPrivacy: 'سياسة الخصوصية',
+        footerTerms: 'شروط الاستخدام',
+        footerContact: 'اتصل بنا',
+        footerCopyright: 'جميع الحقوق محفوظة © 2026 سجلات الشخصية الجانبية.'
+      },
+      en: {
+        appTitle: 'Side Character Chronicles',
+        appSubtitle: 'Interactive Cinematic Narrative Engine Powered by Free-form Writing & 100% Offline AI',
+        engineBadge: '⚡ 100% Offline Intelligent Narrative Engine (No API / No Internet Needed)',
+        selectWorldTitle: 'Choose Your Anime Universe',
+        selectWorldSubtitle: 'Experience the story as an unsung side character pulling strings behind the scenes without preset buttons',
+        characterCreateTitle: 'Character Creation',
+        characterCreateSubtitle: 'Define your role, tactical trait, and secret agenda for local NLP engine adaptation',
+        roleLabel: 'Your Role / Duty',
+        rolePlaceholder: 'e.g. Supply guard, combat medic, relay ninja, dock engineer...',
+        roleDefault: 'Supply Vanguard Scout',
+        traitLabel: 'Tactical Trait',
+        traitPlaceholder: 'e.g. Hyper-observant, stoic under fire, tactical opportunist...',
+        traitDefault: 'Methodical observer of enemy weaknesses',
+        goalLabel: 'Secret Agenda',
+        goalPlaceholder: 'e.g. Survive until retirement, save squad members, secure ancient relic...',
+        goalDefault: 'Survive the catastrophe and secure an escape route',
+        btnStartStory: 'Enter The Shadows ⚔️',
+        btnBack: 'Back',
+        turnLabel: 'Chapter',
+        healthLabel: 'Vitality (HP)',
+        levelLabel: 'Level',
+        xpLabel: 'XP',
+        plotArmorTitle: 'Plot Armor',
+        plotArmorActive: 'Active (Protects from lethal strikes)',
+        plotArmorExhausted: 'Depleted! Any lethal damage is fatal',
+        specialAbilitiesTitle: 'Tactical Abilities',
+        abilityReady: 'Ready to deploy!',
+        useAbilityBtn: 'Activate Ability ⚡',
+        diceRollTitle: 'Dice of Fate (D20)',
+        btnRollDice: 'Roll D20 🎲',
+        freeFormHeading: 'Type your exact decision or custom action below:',
+        freeFormPlaceholder: 'Describe your next move in detail... (e.g., I slide under the debris, toss a smoke grenade to cover the medic team, then hack the enemy radio to transmit fake retreat orders...)',
+        freeFormCharCount: 'characters',
+        btnSubmitDecision: 'Submit Action & Shape Destiny ✍️',
+        analyzingInput: 'Parsing your intent & generating next chapter locally...',
+        btnNewGame: 'New Game 🔄',
+        historyHeading: 'Chronicles & Past Decisions',
+        suggestionPrompt: 'Inspiration chips (click to inject):',
+        sug1: 'Launch a sudden ambush at their unprotected blind spot',
+        sug2: 'Melt into the shadows to eavesdrop on commanders',
+        sug3: 'Utilize the environment to set an electrified wire trap',
+        sug4: 'Engage in high-stakes diplomatic bluff and misdirection',
+        sug5: 'Reckless gamble: ignite the fuel depot as a massive distraction',
+        canonHeroLabel: 'Butterfly Effect on Heroes:',
+        consequenceLabel: 'Direct Consequences:',
+        detectedIntent: 'Detected Tactical Intent:',
+        intent_attack: '⚔️ Direct Assault & Combat',
+        intent_stealth: '🕵️ Silent Infiltration & Recon',
+        intent_environment: '⚙️ Environmental & Tool Mastery',
+        intent_tactical: '🧠 Tactical Maneuver & Deception',
+        intent_reckless: '🔥 Desperate Gamble & Chaos',
+        intent_balanced: '⚖️ Balanced Survival Action',
+        // Compliance & Ads
+        adPlaceholderHeader: 'Top Ad Space (Leaderboard 728x90 / Responsive)',
+        adPlaceholderFooter: 'Bottom Ad Space (Responsive Banner 728x90)',
+        adNotice: 'Advertisement • Sponsored',
+        cookieText: 'We use cookies and browser local storage to save your game progress and support third-party ad networks in compliance with Google AdSense policies.',
+        cookieAccept: 'Accept & Play ✔️',
+        cookieLearnMore: 'Privacy Policy',
+        footerPrivacy: 'Privacy Policy',
+        footerTerms: 'Terms of Service',
+        footerContact: 'Contact Us',
+        footerCopyright: 'All rights reserved © 2026 Side Character Chronicles.'
+      }
+    };
+
+    // ========================================================
+    // 3. 8 Anime Universes Data
+    // ========================================================
+    const ANIME_WORLDS = [
+      {
+        id: 'aot',
+        name: 'هجوم العمالقة | Attack on Titan',
+        genre: 'Dark Fantasy / Survival',
+        badgeColor: 'from-amber-600 to-stone-800',
+        borderColor: 'border-amber-600/40',
+        glowColor: 'hover:shadow-amber-500/20',
+        canonHero: 'إيرين ييغر & ليفاي أكرمان',
+        descriptionAr: 'عالم الأسوار الضخمة حيث البشرية محاصرة بالعمالقة المرعبين وصراع النجاة القاسي.',
+        descriptionEn: 'The grim world behind the concentric walls facing monstrous Titans.',
+        loreKeywords: ['عملاق', 'سور', 'نصل', 'غاز', 'مناورة', 'دماء', 'مدرع', 'فيلق'],
+        initialSceneAr: 'أنت في الصفوف الخلفية مع فوج الدعم اللوجستي بالقرب من جدار روز. فجأة ينطلق بوق الإنذار الثالث، ومجموعة من العمالقة الصغار تخترق أحد الشوارع الجانبية بينما الفرسان منشغلون بالعملاق المدرع!',
+        initialSceneEn: 'Stationed with the supply corps near Wall Rose. The emergency siren wails—abnormal Titans have broken into the eastern alley while elite scouts battle the Armored Titan!'
+      },
+      {
+        id: 'jjk',
+        name: 'جوجوتسو كايسن | Jujutsu Kaisen',
+        genre: 'Supernatural / Modern Fantasy',
+        badgeColor: 'from-purple-600 to-slate-900',
+        borderColor: 'border-purple-600/40',
+        glowColor: 'hover:shadow-purple-500/20',
+        canonHero: 'ساتورو غوجو & يوجي إيتادوري',
+        descriptionAr: 'مدرسة طوكيو للتقنيات واللعنات حيث تتجسد مشاعر البشر السلبية كأرواح ملعونة مرعبة.',
+        descriptionEn: 'Tokyo Jujutsu High battles terrifying cursed spirits born from human negative emotion.',
+        loreKeywords: ['لعنة', 'طاقة ملعونة', 'شيبويا', 'ستار', 'نطاق', 'تعويذة', 'أصابع'],
+        initialSceneAr: 'أنت مساعد ميداني إداري من الرتبة الثالثة تراقب حاجز (الستار) الخارجي في شيبويا. فجأة تنكسر تعويذة الستار، وتندفع روح ملعونة خاصة نحو مخرج المترو المكتظ بالمدنيين!',
+        initialSceneEn: 'You are an auxiliary window manager outside the Shibuya barrier. A special-grade spirit breaches the talisman ward, rushing toward the civilian subway entrance!'
+      },
+      {
+        id: 'onepiece',
+        name: 'ون بيس | One Piece',
+        genre: 'Pirate Adventure / Shonen',
+        badgeColor: 'from-sky-500 to-blue-800',
+        borderColor: 'border-sky-500/40',
+        glowColor: 'hover:shadow-sky-500/20',
+        canonHero: 'مونكي دي لوفي & قراصنة قبعة القش',
+        descriptionAr: 'مغامرات البحار العظمى، فواكه الشيطان، وصراعات المارينز والأباطرة الأربعة.',
+        descriptionEn: 'The sprawling Grand Line of devil fruits, Marine bases, and emperors of the sea.',
+        loreKeywords: ['بحرية', 'هاكي', 'فاكهة', 'قرصان', 'مدفع', 'باستر كول', 'سفينة'],
+        initialSceneAr: 'أنت فني صيانة مدافع في ميناء أركبيلاغو سابودي. انطلقت مدافع باستر كول فجأة في الميناء بعد لكمة لوفي لأحد التنانين السماوية، وعليك التصرف وسط الفوضى العارمة!',
+        initialSceneEn: 'You are a dock engineer in Sabaody Archipelago. An Admiral has been summoned after Luffy struck a Celestial Dragon, and cannon shells begin raining on the harbor!'
+      },
+      {
+        id: 'naruto',
+        name: 'ناروتو شيبودن | Naruto Shippuden',
+        genre: 'Ninja / Shinobi Epic',
+        badgeColor: 'from-orange-500 to-red-800',
+        borderColor: 'border-orange-500/40',
+        glowColor: 'hover:shadow-orange-500/20',
+        canonHero: 'ناروتو أوزوماكي & كاكاشي هاتاكي',
+        descriptionAr: 'قرية كونوها الخفية وتقنيات النينجوتسو وصراعات الشينوبي الكبرى.',
+        descriptionEn: 'The hidden shinobi village of Konoha amidst devastating ninja warfare.',
+        loreKeywords: ['تشاكرا', 'كوناي', 'نينجا', 'ختم', 'شارينغان', 'باين', 'كونوها'],
+        initialSceneAr: 'أنت شينوبي حراسة في برج الاتصالات اللاسلكية بالقرية. سماء كونوها تنشق وفجأة تظهر أجساد باين الستة وتبدأ تقنية شينرا تينسي في التجمع فوق المركز!',
+        initialSceneEn: 'You are a communications chunin in Konoha central tower. The sky darkens as the Six Paths of Pain appear above the village preparing Shinra Tensei!'
+      },
+      {
+        id: 'bleach',
+        name: 'بليتش | Bleach: Thousand-Year Blood War',
+        genre: 'Soul Reapers / Supernatural',
+        badgeColor: 'from-cyan-600 to-slate-900',
+        borderColor: 'border-cyan-600/40',
+        glowColor: 'hover:shadow-cyan-500/20',
+        canonHero: 'إيتشيغو كوروساكي & قادة السيريتي',
+        descriptionAr: 'مجتمع الأرواح، الشينيغامي، ومبارزات الزانباكتو الأسطورية ضد الكوينشي.',
+        descriptionEn: 'The Soul Society and Soul Reapers defending Seireitei with Zanpakuto releases.',
+        loreKeywords: ['رياتسو', 'زانباكتو', 'شينيغامي', 'كوينشي', 'بانكاي', 'سيريتي'],
+        initialSceneAr: 'أنت عضو في الفرقة الرابعة الطبية في باحة السيريتي. تندلع ألسنة اللهب الأزرق مع غزو فرسان الكوينشي (شتيرنريتر) ويبدأ قفل مسارات الرياتسو!',
+        initialSceneEn: 'Stationed with Squad 4 medical corps in Seireitei. Blue Quincy reishi flames erupt as the Sternritter invade, jamming telepathic communications!'
+      },
+      {
+        id: 'hxh',
+        name: 'هنتر x هنتر | Hunter x Hunter',
+        genre: 'Tactical / Adventure',
+        badgeColor: 'from-emerald-600 to-teal-950',
+        borderColor: 'border-emerald-600/40',
+        glowColor: 'hover:shadow-emerald-500/20',
+        canonHero: 'غون فريكس & كيلوا زولديك',
+        descriptionAr: 'عالم صيادي الجوائز، تقنيات النين المعقدة، وغموض نمل الكيميرا المميت.',
+        descriptionEn: 'The high-intellect world of Hunters, complex Nen vows, and lethal threats.',
+        loreKeywords: ['نين', 'هالة', 'صياد', 'نمل الكيميرا', 'غيو', 'رين', 'عهد'],
+        initialSceneAr: 'أنت مراقب في قصر نمل الكيميرا في جمهورية غوروتو الشرقية. يبدأ اجتياح القصر في الثانية 00:00:00 وتنين زينو زولديك يمزق السقف كشهب ذهبية!',
+        initialSceneEn: 'Stationed at the outer gate of East Gorteau palace at second 00:00:00. Zeno Zoldyck’s Dragon Dive shatters the palace roof into golden meteors!'
+      },
+      {
+        id: 'demonslayer',
+        name: 'قاتل الشياطين | Demon Slayer',
+        genre: 'Historical Dark Fantasy',
+        badgeColor: 'from-rose-600 to-stone-900',
+        borderColor: 'border-rose-600/40',
+        glowColor: 'hover:shadow-rose-500/20',
+        canonHero: 'تانجيرو كامادو & الهاشيرا',
+        descriptionAr: 'فيلق قتلة الشياطين، أنفاس القتال، والصراع المميت ضد موزان في قلعة الأبعاد.',
+        descriptionEn: 'The Demon Slayer Corps wielding breathing styles in the dead of night.',
+        loreKeywords: ['شيطان', 'نيتشيرين', 'تنفس', 'كاكوشي', 'هاشيرا', 'قلعة الأبعاد', 'سم'],
+        initialSceneAr: 'أنت من فرقة الكاكوشي (المسعفين الميدانيين) في قلعة الأبعاد اللانهائية. الجدران والأبواب تتحرك بشكل جنوني وصوت بيوا ناكيمي يتردد في كل زاوية!',
+        initialSceneEn: 'You are a Kakushi support medic trapped inside the Infinity Castle. The rooms distort wildly to the strumming of Nakime’s biwa as demons lurk in the shadows!'
+      },
+      {
+        id: 'mha',
+        name: 'أكاديمية بطلي | My Hero Academia',
+        genre: 'Superhero / Modern Action',
+        badgeColor: 'from-green-500 to-emerald-900',
+        borderColor: 'border-green-500/40',
+        glowColor: 'hover:shadow-green-500/20',
+        canonHero: 'ديكو (ميدوريا) & ألميت',
+        descriptionAr: 'عالم القدرات الخارقة (الكويرك) والصراع المحتدم بين الأبطال وعصبة الأشرار.',
+        descriptionEn: 'A society of Quirks where heroes and the League of Villains clash.',
+        loreKeywords: ['كويرك', 'بطل', 'شرير', 'نومو', 'أجهزة دعم', 'مركز التدريب', 'تحالف'],
+        initialSceneAr: 'أنت فرد في وحدة دعم الأجهزة والمعدات في مركز تدريب الكوارث (USJ). ينهار التيار الكهربائي فجأة ويفتح ضباب كوروجيري الأسود بوابات هجوم الأشرار في الساحة المركزية!',
+        initialSceneEn: 'You are a support course technician at the USJ dome. The power grid collapses as Kurogiri’s purple mist opens dozens of villain warp gates!'
+      }
+    ];
+
+    // ========================================================
+    // 4. Natural Language Keyword & Intent Parser
+    // ========================================================
+    const INTENT_LEXICONS = {
+      attack: [
+        'هجوم', 'أهجم', 'ضرب', 'أضرب', 'أطعن', 'طعن', 'سيف', 'نصل', 'رصاص', 'إطلاق', 'أطلق', 'سحق',
+        'اشتباك', 'اقتحام', 'أقتحم', 'أقاتل', 'قتال', 'لكم', 'كسر', 'تفجير', 'أفجر', 'قنبلة', 'سلاح',
+        'قطع', 'ذبح', 'إبادة', 'تصدي', 'التحام', 'مواجهة', 'أواجه', 'اندفاع', 'أندفع', 'انقضاض', 'هجومي',
+        'attack', 'strike', 'fight', 'charge', 'slash', 'stab', 'shoot', 'blast', 'assault', 'smash',
+        'crush', 'blade', 'punch', 'ambush', 'offensive', 'engage', 'kill', 'destroy'
+      ],
+      stealth: [
+        'تسلل', 'أتسلل', 'ظل', 'ظلال', 'اختفاء', 'أختفي', 'صمت', 'مراقبة', 'أراقب', 'زحف', 'أزحف',
+        'تنصت', 'أتجسس', 'تجسس', 'ركام', 'تمويه', 'أموّه', 'اختباء', 'أختبئ', 'هدوء', 'كواليس',
+        'تراجع بصمت', 'خلف الجدار', 'تحت الأنقاض', 'خفاء', 'ممر جانبي', 'تتبع', 'كمين هادئ',
+        'sneak', 'shadow', 'stealth', 'hide', 'quiet', 'silent', 'crawl', 'eavesdrop', 'infiltrate',
+        'spy', 'camouflage', 'covert', 'observe', 'recon', 'unseen', 'blend'
+      ],
+      environment: [
+        'بيئة', 'أدوات', 'أداة', 'حبل', 'أسلاك', 'سلك', 'جدار', 'عمود', 'سقف', 'رافعة', 'باب', 'بوابة',
+        'مفتاح', 'كهرباء', 'تيار', 'صمام', 'غاز', 'أنبوب', 'ماء', 'نار', 'إشعال', 'فخ', 'أنصب فخ',
+        'حجارة', 'صخرة', 'أجهزة', 'جهاز', 'لاسلكي', 'إشارة', 'بث', 'إصلاح', 'علاج', 'تضميد', 'إسعاف',
+        'ضماد', 'دواء', 'مؤن', 'حقيبة', 'استغلال', 'حطام',
+        'tool', 'wire', 'cable', 'rope', 'wall', 'pillar', 'trap', 'lever', 'door', 'gate', 'valve',
+        'pipe', 'gas', 'electric', 'power', 'device', 'radio', 'signal', 'repair', 'heal', 'bandage',
+        'medic', 'aid', 'debris', 'environment', 'structure', 'mechanism'
+      ],
+      tactical: [
+        'حوار', 'أتحدث', 'كلام', 'تفاوض', 'أتفاوض', 'خداع', 'أخدع', 'كذب', 'أكذب', 'تضليل', 'أضلل',
+        'إلهاء', 'ألهي', 'انسحاب', 'أنسحب', 'تراجع', 'استدراج', 'أستدرج', 'خطة', 'تكتيك', 'ثغرة',
+        'حيلة', 'مناورة', 'توزيع', 'استسلام زائف', 'اتفاق', 'أعرض مساعدة', 'مفاوضات', 'تشتيت',
+        'talk', 'speak', 'negotiate', 'bluff', 'deceive', 'trick', 'distract', 'feint', 'retreat',
+        'withdraw', 'maneuver', 'strategy', 'tactic', 'mislead', 'bargain', 'fake', 'parley', 'bribe'
+      ],
+      reckless: [
+        'انتحار', 'تضحية', 'أضحي', 'جنون', 'مجنون', 'رهان', 'أراهن', 'مجازفة', 'كل شيء', 'أرمي نفسي',
+        'فوضى', 'يائس', 'صرخة', 'تفجير الذات', 'اصطدام', 'بدون تفكير', 'مخاطرة عظمى', 'أقحف', 'انفجار هائل',
+        'gamble', 'sacrifice', 'suicide', 'reckless', 'crazy', 'insane', 'all-in', 'desperate', 'chaos',
+        'overload', 'blast everything', 'ram', 'kamikaze', 'unhinged'
+      ]
+    };
+
+    function analyzePlayerInputIntent(rawText) {
+      if (!rawText || !rawText.trim()) return 'balanced';
+      const clean = rawText.toLowerCase().replace(/[^\w\s\u0600-\u06FF]/gi, ' ');
+      const words = clean.split(/\s+/).filter(Boolean);
+
+      const scores = {
+        attack: 0,
+        stealth: 0,
+        environment: 0,
+        tactical: 0,
+        reckless: 0
+      };
+
+      for (const word of words) {
+        const stripped = word.replace(/^(ال|و|ف|ب|ل|ت|ي)/, '');
+        for (const [intent, keywords] of Object.entries(INTENT_LEXICONS)) {
+          for (const kw of keywords) {
+            if (word === kw || word.includes(kw) || (stripped.length > 2 && stripped.includes(kw))) {
+              scores[intent] += 1;
+            }
+          }
+        }
+      }
+
+      let bestIntent = 'balanced';
+      let maxScore = 0;
+      for (const [intent, score] of Object.entries(scores)) {
+        if (score > maxScore) {
+          maxScore = score;
+          bestIntent = intent;
+        }
+      }
+
+      return maxScore > 0 ? bestIntent : 'tactical';
+    }
+
+    // ========================================================
+    // 5. Dynamic Offline Narrative Generation Engine
+    // ========================================================
+    const NARRATIVE_TEMPLATES = {
+      attack: {
+        successTitlesAr: [
+          'صدمة النصل المباغت في الخاصرة',
+          'اندفاعة الظل: كسر خطوط الإمداد',
+          'ضربة محسوبة خلف دروع الخصم',
+          'انقضاض الكواليس يربك التشكيل'
+        ],
+        successTitlesEn: [
+          'The Silent Blade Pierces the Flank',
+          'Vanguard Breach: Fracturing Hostile Lines',
+          'Calculated Strike Behind Heavy Armor',
+          'Backstage Ambush Shatters Formation'
+        ],
+        scenesAr: [
+          'أخذت نفساً عميقاً، ثم اندفعت من موقعك مستغلاً التوقيت الدقيق لقرارك: "{DECISION}". اندفاعك لم يكن استعراضياً بل ضربة جراحية من موقع شخصية غير محسوبة في حسابات العدو! ارتطمت ضربتك بنقطة تمفصل دفاعاتهم، مما أحدث دوياً هائلاً أجبر القادة المعادين على الالتفات بهلع.',
+          'استجابت عضلاتك لغرائز دورك كـ ({ROLE}). وبدلاً من الانتظار، نفذت خطوتك القتالية: "{DECISION}". فاجأت الخصم بسرعة بديهتك، حيث لم يتوقع أحد أن يأتي الهجوم من ممر الإمدادات الخلفي. ترنح العدو وأسقطت قطعة من عتاده الاستراتيجي على الأرض وسط تصاعد الغبار!',
+          'في خضم الفوضى، اتخذت قرارك الصارم: "{DECISION}". صفتك المتمثلة في ({TRAIT}) جعلتك تحدد ثغرة حركية في جسد الخصم لا يراها المحاربون المنهكون في المقدمة. انقضضت بقوة، موقعاً إصابة مؤثرة فتحت ممراً آمناً لحلفائك!'
+        ],
+        scenesEn: [
+          'Taking a calculated breath, you lunged forward acting on your decision: "{DECISION}". Your strike bypassed their vanguard, hitting the exact weak hinge they left uncovered. The impact resonated through the corridor, forcing enemy commanders to spin in bewilderment!',
+          'Harnessing your instinct as a ({ROLE}), you struck directly: "{DECISION}". Nobody expected offensive pressure from a backend support operative. Your aggressive push threw their perimeter into disarray, disarming a squad vanguard under heavy smoke!',
+          'Amidst the deafening roar of war, your trait ({TRAIT}) pinpointed a blind spot. Executing: "{DECISION}", you delivered a decisive rupture that shattered their momentum and cleared an evacuation route!'
+        ],
+        heroImpactAr: 'أتاح هجومك المباغت لـ ({HERO}) التحرر من الحصار والتركيز على توجيه ضربتهم القاضية دون تهديد في ظهورهم!',
+        heroImpactEn: 'Your sudden assault relieved the pressure on ({HERO}), allowing them to prepare their ultimate counterattack uninterrupted!',
+        consequenceAr: 'نجحت في زعزعة خطوط العدو ولكنك بذلت مجهوداً عضلياً مضنياً جعلك تلتقط أنفاسك خلف متراس خرساني.',
+        consequenceEn: 'Successfully disrupted enemy formation, but physical strain forces you to take cover behind solid debris.',
+        healthBase: -5,
+        xpBase: 45
+      },
+      stealth: {
+        successTitlesAr: [
+          'أشباح في الممر الجانبي',
+          'عين خفية ترصد المخطط السري',
+          'انزلاق صامت تحت أنوف الحراس',
+          'خطوات بلا صدى في معقل الخطر'
+        ],
+        successTitlesEn: [
+          'Phantoms in the Side Alley',
+          'Unseen Eyes Intercept the Secret Order',
+          'Silent Glide Beneath Hostile Sentries',
+          'Echoless Footsteps in the Zone of Peril'
+        ],
+        scenesAr: [
+          'اندمجت مع الظلال كأنك جزء من جدران المكان، مطبقاً قرارك: "{DECISION}". بفضل هدوء أعصابك ودورك كـ ({ROLE})، مررت تحت مسار أجهزة الرصد وعيون الحراس دون إثارة أي ريبة. بينما كانت القذائف تدك الساحة، تمكنت من رصد خريطة إحداثيات سرية ملقاة على طاولة القيادة المهجورة!',
+          'حبست أنفاسك وتسللت متتبعاً خطتك: "{DECISION}". صفتك المتمثلة في ({TRAIT}) جعلتك تتجنب كل قطعة زجاج مكسورة أو صفيحة معدنية قد تصدر صوتاً. من موقعك المظلم، سمعت قادة العدو وهم يهمسون بنقطة ضعف فتاكة في سلاحهم الرئيسي!',
+          'تحركت كشبح غير مرئي، منفذاً تصرفك الحذر: "{DECISION}". تسلقت إلى نقطة مراقبة مرتفعة في الهيكل الحديدي. رأيت المعركة بأكملها تنبسط كلوحة شطرنج، وحققت خطوة هامة نحو هدفك السري ({GOAL}) دون أن تطلق رصاصة واحدة أو ينكشف موقعك!'
+        ],
+        scenesEn: [
+          'You dissolved into the shadows, executing your covert maneuver: "{DECISION}". Guided by your nature as a ({ROLE}), you slipped past sensors and alert sentries completely undetected. From the gloom, you secured classified tactical coordinates left on an abandoned console!',
+          'Holding your breath, you navigated the ruins per: "{DECISION}". Your defining trait ({TRAIT}) ensured every step was placed on vibration-dampened rubble. Hidden in the rafters, you overheard the commanders revealing the critical vulnerability of their dread weapon!',
+          'Moving like an intangible shadow: "{DECISION}". You reached an elevated perch above the combat floor. The grand battlefield unfolded below like a chessboard, advancing your secret goal ({GOAL}) while preserving your vital stamina!'
+        ],
+        heroImpactAr: 'أرسلت إشارة ضوئية صامتة أو توجيهاً غير مرئي رآه ({HERO}) وتفادى به كميناً مميتاً كان معداً لإسقاطه!',
+        heroImpactEn: 'You transmitted a subtle shadow signal that allowed ({HERO}) to sidestep a lethal ambush engineered for their downfall!',
+        consequenceAr: 'حافظت على كامل طاقتك وصحتك، واكتسبت معلومات استخباراتية ثمينة عن الخطوة التالية للعدو.',
+        consequenceEn: 'Preserved full vitality and obtained vital tactical intelligence regarding the enemy’s next strike.',
+        healthBase: 5,
+        xpBase: 35
+      },
+      environment: {
+        successTitlesAr: [
+          'هندسة الفخاخ: تحويل الخراب لسلاح',
+          'انفجار الدوائر وسقوط الرافعة',
+          'البيئة تنقلب ضد الغزاة',
+          'عبقرية الدعم اللوجستي في الميدان'
+        ],
+        successTitlesEn: [
+          'Trapcraft: Weaponizing Ruin',
+          'Circuit Rupture & Cranes Collapsing',
+          'The Environment Turns Predator',
+          'Logistical Mastery on the Frontlines'
+        ],
+        scenesAr: [
+          'نظرت حولك في الميدان بعين فاحصة، وبدأت في تطبيق تصرفك: "{DECISION}". بصفتك ({ROLE})، أنت تعرف نقاط الضعف الإنشائية لهذا المكان أفضل من أي شخص آخر. قمت بربط أسلاك التوتر العالي وصمامات الضغط المكسورة، لتخلق فخاً عبقرياً ابتلع فرقة الاستطلاع المعادية بمجرد تقدمهم!',
+          'لم تهاجم بسلاحك بل جعلت البيئة تقاتل بدلاً منك: "{DECISION}". استغللت مهاراتك وسمتك ({TRAIT}) لتفجير دعامة السقف المؤقتة فوق ممر الإمدادات. انهار طن من الركام المعدني قاطعاً الطريق على تعزيزات العدو، بينما حميت نفسك تحت هيكل حديدي متين!',
+          'أخرجت أدواتك ومعداتك الطارئة ونفذت: "{DECISION}". عدلت مسار أنابيب الوقود وبثثت مادة لزجة حاجبة للرؤية على أرضية الممر. انزلق المهاجمون وفقدوا السيطرة على معداتهم، بينما استوليت بهدوء على حقيبة إسعافات وذخيرة إضافية!'
+        ],
+        scenesEn: [
+          'Scanning the ruins with an expert eye, you put your plan into motion: "{DECISION}". As a ({ROLE}), you understand the structural anatomy of this facility better than anyone. Rigging high-tension cables into a pressure-trigger trap, you snared their scouting vanguard the moment they crossed the threshold!',
+          'Rather than swinging a blade, you weaponized the environment: "{DECISION}". Capitalizing on your trait ({TRAIT}), you sheared the anchor bolts of a massive overhead crane. Tons of reinforced girder collapsed, sealing off enemy reinforcements while you remained shielded behind bulkheads!',
+          'Deploying field gear and ingenuity: "{DECISION}". You redirected ruptured coolant conduits to flood the corridor with blinding mist and slippery friction fluid. The attackers lost traction and balance, giving you the chance to scavenge emergency medical rations and supplies!'
+        ],
+        heroImpactAr: 'عطّل الفخ الذي صنعته في البيئة تقدم وحوش النخبة، مانحاً ({HERO}) الوقت الكافي للتقاط أنفاسهم وشحن طاقتهم القصوى!',
+        heroImpactEn: 'Your environmental trap paralyzed the elite advance, granting ({HERO}) the crucial seconds needed to recharge their signature ability!',
+        consequenceAr: 'صنعت حاجزاً دفاعياً منيعاً وغنمت مؤناً طبية استعادت جزءاً من عافيتك.',
+        consequenceEn: 'Erected an impregnable defensive choke-point and salvaged medical rations to bolster your vitality.',
+        healthBase: 10,
+        xpBase: 40
+      },
+      tactical: {
+        successTitlesAr: [
+          'مناورة الشطرنج: سحب الخيوط في الظلام',
+          'خديعة اللاسلكي والموجات المضللة',
+          'دبلوماسية التهديد والانسحاب التكتيكي',
+          'إلهاء عبقري يقلب موازين الميدان'
+        ],
+        successTitlesEn: [
+          'Chessboard Gambit: Strings in the Dark',
+          'Radio Spoofing & Phantom Frequencies',
+          'Calculated Bluff & Tactical Feint',
+          'Masterstroke Diversion Upends the Sector'
+        ],
+        scenesAr: [
+          'استخدمت دهاءك وبرود أعصابك لتنفيذ قرارك: "{DECISION}". كـ ({ROLE}) صاحب السمة ({TRAIT})، أدركت أن القوة الغاشمة وحدها لن تجدي. أطلقت بثاً خادعاً عبر أجهزة الاتصال يحذر من تعزيزات وهمية قادمة، مما جعل كتيبة الخصم تنقسم وتبتعد عن موقعك وموقع رفاقك!',
+          'وقفت بثبات وألقيت كلمتك أو مناورتك: "{DECISION}". بنيت خدعتك بذكاء خارق؛ أوهمت العدو بأن الموقع ملغوم بمتفجرات موقوتة، مما جعل قائدهم يتردد لعشر ثوانٍ حرجة كانت كافية لإعادة ترتيب صفوف المدافعين وفتح نافذة انسحاب تكتيكية!',
+          'ناورت بحنكة استثنائية: "{DECISION}". استدرجت طليعة العدو إلى زقاق مسدود عبر رمي مشاعل ضوئية وأصوات وهمية، ثم انسحبت برشاقة من منفذ الطوارئ. لقد ربحت المعركة التكتيكية بالعقل الخالص واقتربت خطوة كبرى من ({GOAL})!'
+        ],
+        scenesEn: [
+          'Employing razor-sharp intellect, you enacted your maneuver: "{DECISION}". As a ({ROLE}) armed with ({TRAIT}), you recognized brute force was a trap. Broadcasting a spoofed distress frequency signaling phantom reinforcements, you caused the hostile squad to fracture in confusion!',
+          'Standing resolute, you engineered a brilliant deception: "{DECISION}". Feigning that the entire sector was wired with subterranean explosives, you forced their field commander into a ten-second hesitation—the exact margin needed to open a tactical retreat corridor!',
+          'Maneuvering with surgical cunning: "{DECISION}". You baited the enemy vanguard into a narrow cul-de-sac using audio decoys and flare reflections, exiting cleanly via an auxiliary hatch. You won the tactical round through pure intellect, drawing nearer to ({GOAL})!'
+        ],
+        heroImpactAr: 'أجبرت مناورتك التضليلية قادة العدو على توجيه دفاعاتهم بالخطأ، مما ترك ظهرهم مكشوفاً لضربة مدمرة من ({HERO})!',
+        heroImpactEn: 'Your strategic bluff tricked the commanders into facing the wrong vector, leaving their flank wide open to a crushing assault by ({HERO})!',
+        consequenceAr: 'تفاديت مواجهة خاسرة، وسيطرت على وتيرة المعركة بأقل مجهود بدني ممكن.',
+        consequenceEn: 'Averted an unwinnable brawl, taking complete control of the battlefield tempo with minimal fatigue.',
+        healthBase: 0,
+        xpBase: 40
+      },
+      reckless: {
+        successTitlesAr: [
+          'مخاطرة على حافة الجحيم',
+          'انفجار اليأس: اشتعال كل شيء',
+          'رهان الجنون الذي حطم المستحيل',
+          'صرخة في قلب العاصفة'
+        ],
+        successTitlesEn: [
+          'Gamble on the Brink of Inferno',
+          'Desperate Ignition: Shattering the Void',
+          'The Madman’s Wager Defies Impossible Odds',
+          'A Cry in the Eye of the Storm'
+        ],
+        scenesAr: [
+          'تجاهلت كل تحذيرات العقل ونفذت قرارك الانتحاري الجريء: "{DECISION}"! اندفعت إلى قلب اللهب المتصاعد وأنت تصرخ باسم هدفك السري ({GOAL}). أطلقت العنان لكل ما تملك من طاقة وعتاد في ضربة واحدة متهورة فجرت صهريج الإمدادات في وجه الجميع! تطايرت الشظايا في كل اتجاه، وارتطمت بجدار إسمنتي وأنت تبتسم وسط الدخان الكثيف!',
+          'كان رهاناً مجنوناً بكل المقاييس: "{DECISION}". كـ ({ROLE}) معتاد على البقاء في الخلف، قفزت مباشرة بين مخالب الخطر. أصابتك شظايا النيران والصدمة الارتدادية بجروح بالغة، لكن التدمير الذي أحدثته كان أسطورياً بحيث أباد فرقة العدو المتقدمة بالكامل وفتح فجوة عملاقة في الحصار!',
+          'راهنت بكل شيء على رمية واحدة: "{DECISION}". تصرفت بدافع الغريزة الجامحة؛ جذب اندفاعك الصاخب كل أنظار الوحوش والقناصة إليك شخصياً، متحملاً سيلاً من الضربات والخدوش، لكنك اشتريت لرفاقك نجاتهم الأبدية وخلقت معجزة حقيقية في قلب المأساة!'
+        ],
+        scenesEn: [
+          'Casting all caution into the abyss, you unleashed your wild gamble: "{DECISION}"! Roaring your secret conviction ({GOAL}), you plunged straight into the inferno, overloading the power reserves in a catastrophic burst! Shrapnel tore through the mist as you slammed against the bulkhead—bruised, bleeding, yet triumphant!',
+          'It was a wager of absolute madness: "{DECISION}". Stepping out of your quiet role as a ({ROLE}), you threw yourself across the firing arc. Concussive shockwaves battered your ribs, but the resultant blast obliterated the hostile vanguard and cracked open the blockade!',
+          'Putting everything on the line: "{DECISION}". Acting on raw adrenal surge, you drew every sniper scope and monster gaze onto yourself. You endured punishing friction and shrapnel, but your reckless courage bought total salvation for your squad and altered the fate of the war!'
+        ],
+        heroImpactAr: 'صدم جنونك وتضحيتك الجميع، وخلق ثغرة ملحمية لا تتكرر استغلها ({HERO}) لشن هجوم تاريخي لا يُنسى!',
+        heroImpactEn: 'Your fearless sacrifice stunned the battlefield, opening an epic window that ({HERO}) capitalized on with devastating historic force!',
+        consequenceAr: 'تعرضت لإصابات قاسية وضربات قوية نزفت منها صحتك، ولكنك حققت نصراً تكتيكياً ساحقاً وكسبت خبرة هائلة!',
+        consequenceEn: 'Sustained severe concussion and lacerations draining significant HP, but achieved an overwhelming tactical miracle and massive XP!',
+        healthBase: -25,
+        xpBase: 65
+      }
+    };
+
+    function generateOfflineChapter(world, character, playerDecision, turnNumber, d20Roll, isAr, previousTurns) {
+      const detectedIntent = analyzePlayerInputIntent(playerDecision);
+      const templateGroup = NARRATIVE_TEMPLATES[detectedIntent] || NARRATIVE_TEMPLATES.tactical;
+
+      const roll = d20Roll || Math.floor(Math.random() * 20) + 1;
+      const rollBonus = roll >= 14 ? 10 : (roll <= 6 ? -10 : 0);
+
+      let traitSynergy = false;
+      const traitLower = (character.trait || '').toLowerCase();
+      if (detectedIntent === 'stealth' && (traitLower.includes('حذر') || traitLower.includes('ملاحظ') || traitLower.includes('هدوء') || traitLower.includes('observant') || traitLower.includes('stealth'))) {
+        traitSynergy = true;
+      } else if (detectedIntent === 'attack' && (traitLower.includes('شجاع') || traitLower.includes('قوة') || traitLower.includes('هجوم') || traitLower.includes('brave') || traitLower.includes('fierce'))) {
+        traitSynergy = true;
+      } else if (detectedIntent === 'environment' && (traitLower.includes('ميكانيك') || traitLower.includes('أدوات') || traitLower.includes('طبيب') || traitLower.includes('engineer') || traitLower.includes('medic'))) {
+        traitSynergy = true;
+      } else if (detectedIntent === 'tactical' && (traitLower.includes('ذكاء') || traitLower.includes('تكتيك') || traitLower.includes('دهقان') || traitLower.includes('cunning') || traitLower.includes('tactical'))) {
+        traitSynergy = true;
+      }
+
+      const titlesList = isAr ? templateGroup.successTitlesAr : templateGroup.successTitlesEn;
+      const scenesList = isAr ? templateGroup.scenesAr : templateGroup.scenesEn;
+
+      const titleIdx = (turnNumber - 1) % titlesList.length;
+      const sceneIdx = ((turnNumber - 1) + (roll % 3)) % scenesList.length;
+
+      let title = titlesList[titleIdx];
+      let sceneTemplate = scenesList[sceneIdx];
+
+      const decisionSnippet = playerDecision.trim().length > 70 
+        ? playerDecision.trim().slice(0, 68) + '...' 
+        : playerDecision.trim();
+
+      let scene = sceneTemplate
+        .replace(/{DECISION}/g, decisionSnippet)
+        .replace(/{ROLE}/g, character.role || (isAr ? 'جندي دعم' : 'Support Operative'))
+        .replace(/{TRAIT}/g, character.trait || (isAr ? 'اليقظة الميدانية' : 'Field Alertness'))
+        .replace(/{GOAL}/g, character.secretGoal || (isAr ? 'البقاء على قيد الحياة' : 'Survival'));
+
+      const worldLore = world.loreKeywords ? world.loreKeywords[turnNumber % world.loreKeywords.length] : '';
+      if (worldLore && isAr) {
+        scene += ` في تلك اللحظة، هبت رياح المعركة مشبعة بآثار (${worldLore}) الخاص بـ ${world.name.split('|')[0]}، مؤكدة أن قرارك قلب الموازين في تلك الزاوية الحرجة.`;
+      } else if (worldLore && !isAr) {
+        scene += ` At that critical juncture, the battlefield reverberated with signature traces of (${worldLore}), proving your choice turned the tides of this sector.`;
+      }
+
+      if (traitSynergy) {
+        if (isAr) {
+          scene += ` ✨ [تناغم تكتيكي مذهل]: توافقت خطوتك تماماً مع سمتك كـ (${character.trait}) وحققت تفوقاً مضاعفاً!`;
+        } else {
+          scene += ` ✨ [Tactical Synergy]: Your chosen action harmonized flawlessly with your trait (${character.trait}), granting a critical advantage!`;
+        }
+      }
+
+      let heroImpact = (isAr ? templateGroup.heroImpactAr : templateGroup.heroImpactEn)
+        .replace(/{HERO}/g, world.canonHero);
+
+      let consequence = isAr ? templateGroup.consequenceAr : templateGroup.consequenceEn;
+
+      let healthChange = templateGroup.healthBase + (traitSynergy ? 10 : 0) + (roll >= 15 ? 5 : (roll <= 5 ? -10 : 0));
+      let xpGained = templateGroup.xpBase + (traitSynergy ? 15 : 0) + rollBonus;
+
+      return {
+        turnNumber,
+        title: `${isAr ? 'الفصل' : 'Chapter'} ${turnNumber}: ${title}`,
+        scene,
+        canonHeroEvent: heroImpact,
+        consequence,
+        healthChange,
+        xpGained: Math.max(20, xpGained),
+        detectedIntent,
+        d20Roll: roll
+      };
+    }
+
+    // ========================================================
+    // 6. Main Interactive Application Component
+    // ========================================================
+    function App() {
+      const [lang, setLang] = useState('ar');
+      const [hasChosenLang, setHasChosenLang] = useState(false);
+      const [phase, setPhase] = useState('world_select');
+      const [selectedWorld, setSelectedWorld] = useState(null);
+
+      // Character State
+      const [charName, setCharName] = useState('');
+      const [charRole, setCharRole] = useState('');
+      const [charTrait, setCharTrait] = useState('');
+      const [charGoal, setCharGoal] = useState('');
+
+      // Status Bar State
+      const [health, setHealth] = useState(100);
+      const [maxHealth] = useState(100);
+      const [level, setLevel] = useState(1);
+      const [xp, setXp] = useState(0);
+      const [plotArmorActive, setPlotArmorActive] = useState(true);
+
+      // Story & Free-form Input State
+      const [storyTurns, setStoryTurns] = useState([]);
+      const [playerInput, setPlayerInput] = useState('');
+      const [isAnalyzing, setIsAnalyzing] = useState(false);
+      const [lastD20Roll, setLastD20Roll] = useState(null);
+      const [isRollingDice, setIsRollingDice] = useState(false);
+
+      // Cooldown for tactical abilities
+      const [healCooldown, setHealCooldown] = useState(0);
+      const [smokeCooldown, setSmokeCooldown] = useState(0);
+
+      // Legal & Compliance Modals State
+      const [showPrivacyModal, setShowPrivacyModal] = useState(false);
+      const [showTermsModal, setShowTermsModal] = useState(false);
+      const [showContactModal, setShowContactModal] = useState(false);
+      const [cookieAccepted, setCookieAccepted] = useState(true);
+
+      const t = TRANSLATIONS[lang] || TRANSLATIONS.ar;
+      const isAr = lang === 'ar';
+
+      const liveIntent = playerInput.trim() ? analyzePlayerInputIntent(playerInput) : null;
+
+      useEffect(() => {
+        try {
+          const consent = localStorage.getItem('anime_rpg_cookie_consent_v1');
+          if (!consent) {
+            setCookieAccepted(false);
+          }
+        } catch (e) {}
+      }, []);
+
+      const handleAcceptCookies = () => {
+        sound.playClick();
+        try {
+          localStorage.setItem('anime_rpg_cookie_consent_v1', 'accepted_' + Date.now());
+        } catch (e) {}
+        setCookieAccepted(true);
+      };
+
+      useEffect(() => {
+        try {
+          const saved = localStorage.getItem('anime_rpg_offline_engine_save_v2');
+          if (saved) {
+            const data = JSON.parse(saved);
+            if (data.selectedWorld && data.storyTurns?.length > 0) {
+              setLang(data.lang || 'ar');
+              setHasChosenLang(true);
+              setSelectedWorld(data.selectedWorld);
+              setCharName(data.charName || '');
+              setCharRole(data.charRole || '');
+              setCharTrait(data.charTrait || '');
+              setCharGoal(data.charGoal || '');
+              setHealth(data.health ?? 100);
+              setLevel(data.level ?? 1);
+              setXp(data.xp ?? 0);
+              setPlotArmorActive(data.plotArmorActive ?? true);
+              setStoryTurns(data.storyTurns || []);
+              setPhase('story');
+            }
+          }
+        } catch (e) {}
+      }, []);
+
+      useEffect(() => {
+        if (phase === 'story' && selectedWorld) {
+          try {
+            localStorage.setItem('anime_rpg_offline_engine_save_v2', JSON.stringify({
+              lang,
+              selectedWorld,
+              charName,
+              charRole,
+              charTrait,
+              charGoal,
+              health,
+              level,
+              xp,
+              plotArmorActive,
+              storyTurns
+            }));
+          } catch (e) {}
+        }
+      }, [phase, selectedWorld, charName, charRole, charTrait, charGoal, health, level, xp, plotArmorActive, storyTurns, lang]);
+
+      useEffect(() => {
+        const root = document.getElementById('html-root');
+        if (root) {
+          root.setAttribute('dir', isAr ? 'rtl' : 'ltr');
+          root.setAttribute('lang', lang);
+        }
+        if (isAr) {
+          document.body.classList.remove('lang-en');
+        } else {
+          document.body.classList.add('lang-en');
+        }
+      }, [lang, isAr]);
+
+      const handleSelectWorld = (w) => {
+        sound.playClick();
+        setSelectedWorld(w);
+        setCharName(isAr ? 'الظل التكتيكي' : 'Tactical Shadow');
+        setCharRole(t.roleDefault);
+        setCharTrait(t.traitDefault);
+        setCharGoal(t.goalDefault);
+        setPhase('char_create');
+      };
+
+      const handleStartStory = () => {
+        sound.playSuccess();
+        const initialTurn = {
+          turnNumber: 1,
+          title: isAr 
+            ? `الفصل 1: استيقاظ الظل في ${selectedWorld.name.split('|')[0]}` 
+            : `Chapter 1: Shadow Awakes in ${selectedWorld.name.split('|')[1] || selectedWorld.name}`,
+          scene: isAr ? selectedWorld.initialSceneAr : selectedWorld.initialSceneEn,
+          canonHeroEvent: isAr ? `اشتباك عنيف في الجبهة المقابلة يشغله (${selectedWorld.canonHero})` : `Heavy clash engaging (${selectedWorld.canonHero}) on the front lines`,
+          consequence: isAr ? 'أنت في كامل عتادك وصحتك في موقعك بالخفاء تراقب الوضع.' : 'Fully armed and observant from covert position.',
+          playerDecision: isAr ? 'بدء التحرك الميداني والمراقبة' : 'Initial covert deployment',
+          healthChange: 0,
+          xpGained: 25,
+          detectedIntent: 'stealth',
+          d20Roll: 15
+        };
+        setStoryTurns([initialTurn]);
+        setHealth(100);
+        setLevel(1);
+        setXp(25);
+        setPlotArmorActive(true);
+        setPhase('story');
+      };
+
+      const rollDice = () => {
+        if (isRollingDice) return;
+        sound.playDice();
+        setIsRollingDice(true);
+        let count = 0;
+        const interval = setInterval(() => {
+          setLastD20Roll(Math.floor(Math.random() * 20) + 1);
+          count++;
+          if (count > 6) {
+            clearInterval(interval);
+            setIsRollingDice(false);
+          }
+        }, 60);
+      };
+
+      const handleSubmitDecision = () => {
+        const decisionText = playerInput.trim();
+        if (!decisionText || isAnalyzing) return;
+
+        sound.playClick();
+        setIsAnalyzing(true);
+
+        const currentRoll = lastD20Roll || Math.floor(Math.random() * 20) + 1;
+        setLastD20Roll(null);
+
+        setTimeout(() => {
+          const nextTurnNumber = storyTurns.length + 1;
+          const newChapter = generateOfflineChapter(
+            selectedWorld,
+            { name: charName, role: charRole, trait: charTrait, secretGoal: charGoal },
+            decisionText,
+            nextTurnNumber,
+            currentRoll,
+            isAr,
+            storyTurns
+          );
+
+          let nextHealth = Math.min(maxHealth, Math.max(0, health + (newChapter.healthChange || 0)));
+          let armorActive = plotArmorActive;
+
+          if (nextHealth <= 0 && plotArmorActive) {
+            nextHealth = 25;
+            armorActive = false;
+            sound.playPlotArmor();
+            newChapter.scene += isAr 
+              ? ' \n\n⚠️ [تدخل درع الحبكة (Plot Armor)]: تلقيت ضربة كانت لتنهي حياتك، لكن صدفة غير متوقعة أنقذتك في اللحظة الأخيرة واستنفدت درع حبكتك!'
+              : ' \n\n⚠️ [Plot Armor Intervention]: A strike that would have proved fatal was deflected by sheer coincidence, exhausting your plot armor!';
+          } else if (newChapter.healthChange > 0) {
+            sound.playSuccess();
+          }
+
+          const newXpTotal = xp + (newChapter.xpGained || 35);
+          const newLevel = 1 + Math.floor(newXpTotal / 100);
+
+          setHealth(nextHealth);
+          setPlotArmorActive(armorActive);
+          setXp(newXpTotal);
+          setLevel(newLevel);
+
+          if (healCooldown > 0) setHealCooldown(c => c - 1);
+          if (smokeCooldown > 0) setSmokeCooldown(c => c - 1);
+
+          setStoryTurns(prev => [
+            ...prev,
+            {
+              turnNumber: nextTurnNumber,
+              title: newChapter.title,
+              scene: newChapter.scene,
+              canonHeroEvent: newChapter.canonHeroEvent,
+              consequence: newChapter.consequence,
+              playerDecision: decisionText,
+              healthChange: newChapter.healthChange,
+              xpGained: newChapter.xpGained,
+              detectedIntent: newChapter.detectedIntent,
+              d20Roll: currentRoll
+            }
+          ]);
+
+          setPlayerInput('');
+          setIsAnalyzing(false);
+
+          setTimeout(() => {
+            window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
+          }, 100);
+        }, 400);
+      };
+
+      const useFirstAid = () => {
+        if (healCooldown > 0 || health >= maxHealth) return;
+        sound.playSuccess();
+        setHealth(h => Math.min(maxHealth, h + 25));
+        setHealCooldown(3);
+        setPlayerInput(prev => (prev ? prev + ' ' : '') + (isAr ? 'أقوم بتضميد جراحي على عجل واستخدام رذاذ مطهر لاستعادة توازني.' : 'I quickly bandage my lacerations to regain full stability.'));
+      };
+
+      const useSmokeScreen = () => {
+        if (smokeCooldown > 0) return;
+        sound.playClick();
+        setSmokeCooldown(3);
+        setLastD20Roll(18);
+        setPlayerInput(prev => (prev ? prev + ' ' : '') + (isAr ? 'ألقي قنبلة دخانية كثيفة لحجب الرؤية والتراجع إلى نقطة عمياء.' : 'I toss a dense smoke grenade to blind foes and pivot to an unmonitored blind spot.'));
+      };
+
+      const handleResetGame = () => {
+        if (window.confirm(isAr ? 'هل أنت متأكد من بدء مغامرة جديدة ومسح التقدم الحالي؟' : 'Start a new adventure and reset progress?')) {
+          localStorage.removeItem('anime_rpg_offline_engine_save_v2');
+          setStoryTurns([]);
+          setSelectedWorld(null);
+          setPhase('world_select');
+          setHealth(100);
+          setPlotArmorActive(true);
+        }
+      };
+
+      if (!hasChosenLang) {
+        return (
+          <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/90 backdrop-blur-md p-4">
+            <div className="w-full max-w-lg rounded-2xl border border-slate-700 bg-slate-900 p-6 md:p-8 shadow-2xl text-center">
+              <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-2xl bg-gradient-to-tr from-rose-600 to-indigo-600 shadow-lg shadow-rose-500/20 text-3xl">
+                ⚔️
+              </div>
+              <h1 className="text-2xl md:text-3xl font-black text-white mb-2">سجلات الشخصية الجانبية</h1>
+              <h2 className="text-lg font-semibold text-slate-400 mb-6">Anime Side Character RPG (100% Offline)</h2>
+              
+              <p className="text-sm text-slate-300 mb-8 leading-relaxed">
+                اختر لغة اللعبة المفضلة لبدء مغامرتك بالسرد التفاعلي والكتابة الحرة:<br />
+                Choose your preferred language to begin your adventure:
+              </p>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <button
+                  onClick={() => { sound.playClick(); setLang('ar'); setHasChosenLang(true); }}
+                  className="flex flex-col items-center justify-center p-5 rounded-xl border border-rose-500/40 bg-gradient-to-b from-rose-950/40 to-slate-850 hover:border-rose-500 hover:scale-[1.02] transition-all shadow-md group"
+                >
+                  <span className="text-2xl mb-1 group-hover:scale-110 transition-transform">🇸🇦</span>
+                  <span className="font-bold text-lg text-rose-300">اللغة العربية</span>
+                  <span className="text-xs text-slate-400 mt-1">واجهة وقصة وسرد كامل بالعربية</span>
+                </button>
+
+                <button
+                  onClick={() => { sound.playClick(); setLang('en'); setHasChosenLang(true); }}
+                  className="flex flex-col items-center justify-center p-5 rounded-xl border border-indigo-500/40 bg-gradient-to-b from-indigo-950/40 to-slate-850 hover:border-indigo-500 hover:scale-[1.02] transition-all shadow-md group"
+                >
+                  <span className="text-2xl mb-1 group-hover:scale-110 transition-transform">🌐</span>
+                  <span className="font-bold text-lg text-indigo-300">English Language</span>
+                  <span className="text-xs text-slate-400 mt-1">Full English UI & Dynamic Narrative</span>
+                </button>
+              </div>
+            </div>
+          </div>
+        );
+      }
+
+      return (
+        <div className="min-h-screen flex flex-col bg-slate-950 text-slate-100">
+          {/* Header */}
+          <header className="sticky top-0 z-40 border-b border-slate-800 bg-slate-900/80 backdrop-blur-md px-4 py-3">
+            <div className="max-w-6xl mx-auto flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-tr from-rose-600 to-indigo-600 font-black text-xl shadow-md shadow-rose-500/20">
+                  ⚔️
+                </div>
+                <div>
+                  <h1 className="text-base md:text-lg font-bold text-white tracking-wide">{t.appTitle}</h1>
+                  <span className="text-xs text-amber-400 flex items-center gap-1 font-semibold">
+                    <span className="h-2 w-2 rounded-full bg-amber-400 animate-pulse"></span>
+                    {t.engineBadge}
+                  </span>
+                </div>
+              </div>
+
+              <div className="flex items-center gap-2">
+                <button
+                  onClick={() => { sound.playClick(); setLang(l => l === 'ar' ? 'en' : 'ar'); }}
+                  className="px-3 py-1.5 rounded-lg border border-slate-700 bg-slate-800 hover:bg-slate-700 text-xs font-semibold text-slate-300 transition-colors"
+                >
+                  {isAr ? 'English 🌐' : 'العربية 🇸🇦'}
+                </button>
+                {phase === 'story' && (
+                  <button
+                    onClick={handleResetGame}
+                    className="px-3 py-1.5 rounded-lg border border-rose-900/60 bg-rose-950/40 hover:bg-rose-900/50 text-xs font-semibold text-rose-300 transition-colors"
+                  >
+                    {t.btnNewGame}
+                  </button>
+                )}
+              </div>
+            </div>
+          </header>
+
+          {/* TOP AD BANNER PLACEHOLDER (AdSense Leaderboard 728x90 / Responsive) */}
+          <div className="w-full bg-slate-900/50 border-b border-slate-800/80 py-2.5 px-4">
+            <div 
+              id="ad-slot-header"
+              className="max-w-4xl mx-auto min-h-[70px] md:min-h-[90px] border border-dashed border-slate-700/70 bg-slate-850/60 rounded-xl flex flex-col items-center justify-center text-center p-2 relative overflow-hidden group hover:border-slate-600 transition-colors"
+            >
+              <div className="absolute top-1 right-2 text-[10px] uppercase font-mono tracking-wider text-slate-500 bg-slate-900/80 px-2 py-0.5 rounded border border-slate-800">
+                {t.adNotice}
+              </div>
+              <span className="text-xs md:text-sm font-semibold text-slate-400 group-hover:text-slate-300">
+                {t.adPlaceholderHeader}
+              </span>
+              <span className="text-[10px] text-slate-500 font-mono mt-0.5">
+                Ready for Google AdSense Unit (Responsive / 728x90)
+              </span>
+            </div>
+          </div>
+
+          {/* Main Body */}
+          <main className="flex-1 max-w-6xl w-full mx-auto p-4 md:p-6 flex flex-col gap-6">
+
+            {/* PHASE 1: WORLD SELECTION */}
+            {phase === 'world_select' && (
+              <div className="flex flex-col gap-6">
+                <div className="text-center py-6">
+                  <h2 className="text-2xl md:text-3xl font-black text-white mb-2">{t.selectWorldTitle}</h2>
+                  <p className="text-slate-400 text-sm md:text-base max-w-2xl mx-auto">{t.selectWorldSubtitle}</p>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                  {ANIME_WORLDS.map(w => (
+                    <div
+                      key={w.id}
+                      onClick={() => handleSelectWorld(w)}
+                      className={`group cursor-pointer rounded-2xl border ${w.borderColor} bg-slate-900/90 p-5 flex flex-col justify-between hover:scale-[1.02] transition-all duration-200 shadow-lg ${w.glowColor}`}
+                    >
+                      <div>
+                        <div className={`h-2 w-16 rounded-full bg-gradient-to-r ${w.badgeColor} mb-3`}></div>
+                        <span className="text-xs font-semibold text-slate-400">{w.genre}</span>
+                        <h3 className="text-lg font-bold text-white mt-1 group-hover:text-rose-300 transition-colors">{w.name}</h3>
+                        <p className="text-xs text-slate-400 mt-2 leading-relaxed">
+                          {isAr ? w.descriptionAr : w.descriptionEn}
+                        </p>
+                      </div>
+
+                      <div className="mt-4 pt-3 border-t border-slate-800/80 flex items-center justify-between text-xs">
+                        <span className="text-slate-500 font-mono">{isAr ? 'الأبطال:' : 'Heroes:'} {w.canonHero}</span>
+                        <span className="text-rose-400 font-bold group-hover:translate-x-1 transition-transform">←</span>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* PHASE 2: CHARACTER CREATION */}
+            {phase === 'char_create' && selectedWorld && (
+              <div className="max-w-2xl mx-auto w-full rounded-2xl border border-slate-800 bg-slate-900/90 p-6 md:p-8 shadow-2xl flex flex-col gap-6">
+                <div>
+                  <span className="text-xs font-bold uppercase tracking-wider text-rose-400">{selectedWorld.name}</span>
+                  <h2 className="text-2xl font-black text-white mt-1">{t.characterCreateTitle}</h2>
+                  <p className="text-sm text-slate-400 mt-1">{t.characterCreateSubtitle}</p>
+                </div>
+
+                <div className="space-y-4">
+                  <div>
+                    <label className="block text-xs font-bold text-slate-300 mb-1.5">{isAr ? 'اسم الشخصية الجانبية' : 'Character Name'}</label>
+                    <input
+                      type="text"
+                      value={charName}
+                      onChange={e => setCharName(e.target.value)}
+                      className="w-full rounded-xl border border-slate-700 bg-slate-800 px-4 py-2.5 text-sm text-white focus:border-rose-500 focus:outline-none"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-xs font-bold text-slate-300 mb-1.5">{t.roleLabel}</label>
+                    <input
+                      type="text"
+                      value={charRole}
+                      onChange={e => setCharRole(e.target.value)}
+                      placeholder={t.rolePlaceholder}
+                      className="w-full rounded-xl border border-slate-700 bg-slate-800 px-4 py-2.5 text-sm text-white focus:border-rose-500 focus:outline-none"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-xs font-bold text-slate-300 mb-1.5">{t.traitLabel}</label>
+                    <input
+                      type="text"
+                      value={charTrait}
+                      onChange={e => setCharTrait(e.target.value)}
+                      placeholder={t.traitPlaceholder}
+                      className="w-full rounded-xl border border-slate-700 bg-slate-800 px-4 py-2.5 text-sm text-white focus:border-rose-500 focus:outline-none"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-xs font-bold text-slate-300 mb-1.5">{t.goalLabel}</label>
+                    <input
+                      type="text"
+                      value={charGoal}
+                      onChange={e => setCharGoal(e.target.value)}
+                      placeholder={t.goalPlaceholder}
+                      className="w-full rounded-xl border border-slate-700 bg-slate-800 px-4 py-2.5 text-sm text-white focus:border-rose-500 focus:outline-none"
+                    />
+                  </div>
+                </div>
+
+                <div className="flex items-center gap-3 pt-2">
+                  <button
+                    onClick={() => { sound.playClick(); setPhase('world_select'); }}
+                    className="px-4 py-3 rounded-xl border border-slate-700 bg-slate-800 hover:bg-slate-700 text-sm font-bold text-slate-300 transition-colors"
+                  >
+                    {t.btnBack}
+                  </button>
+                  <button
+                    onClick={handleStartStory}
+                    className="flex-1 py-3 rounded-xl bg-gradient-to-r from-rose-600 to-indigo-600 hover:from-rose-500 hover:to-indigo-500 text-sm font-bold text-white shadow-lg shadow-rose-600/30 transition-all hover:scale-[1.01]"
+                  >
+                    {t.btnStartStory}
+                  </button>
+                </div>
+              </div>
+            )}
+
+            {/* PHASE 3: ACTIVE STORY CONSOLE (PURE FREE-FORM WRITING & OFFLINE ENGINE) */}
+            {phase === 'story' && selectedWorld && (
+              <div className="flex flex-col gap-6">
+
+                {/* Character Status Bar */}
+                <div className="rounded-2xl border border-slate-800 bg-slate-900/95 p-4 md:p-5 shadow-xl flex flex-wrap items-center justify-between gap-4">
+                  <div className="flex items-center gap-3">
+                    <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-slate-800 border border-slate-700 text-2xl">
+                      🥷
+                    </div>
+                    <div>
+                      <div className="flex items-center gap-2">
+                        <span className="font-bold text-white text-base">{charName}</span>
+                        <span className="rounded-md bg-rose-950/60 border border-rose-800/50 px-2 py-0.5 text-[11px] font-bold text-rose-300">{charRole}</span>
+                      </div>
+                      <span className="text-xs text-slate-400">{selectedWorld.name}</span>
+                    </div>
+                  </div>
+
+                  {/* Vitals: HP, Level, XP */}
+                  <div className="flex items-center gap-6">
+                    {/* Health Bar */}
+                    <div className="flex flex-col gap-1 w-36">
+                      <div className="flex justify-between text-xs font-semibold">
+                        <span className="text-slate-400">{t.healthLabel}</span>
+                        <span className={health > 30 ? 'text-emerald-400' : 'text-rose-400'}>{health}%</span>
+                      </div>
+                      <div className="h-2 w-full rounded-full bg-slate-800 overflow-hidden">
+                        <div
+                          className={`h-full transition-all duration-300 ${health > 30 ? 'bg-gradient-to-r from-emerald-500 to-teal-400' : 'bg-rose-500'}`}
+                          style={{ width: `${health}%` }}
+                        ></div>
+                      </div>
+                    </div>
+
+                    {/* Level & XP */}
+                    <div className="flex items-center gap-2">
+                      <div className="flex flex-col items-center justify-center h-10 w-10 rounded-xl bg-slate-800 border border-indigo-500/40 text-indigo-300 font-black text-sm">
+                        <span>L{level}</span>
+                      </div>
+                      <div className="flex flex-col text-xs">
+                        <span className="text-slate-400">{t.xpLabel}</span>
+                        <span className="font-bold text-indigo-400">{xp} pts</span>
+                      </div>
+                    </div>
+
+                    {/* Plot Armor Status */}
+                    <div className="flex items-center gap-2 px-3 py-1.5 rounded-xl border border-slate-700 bg-slate-850">
+                      <span className="text-base">{plotArmorActive ? '🛡️' : '💔'}</span>
+                      <div className="flex flex-col text-[11px]">
+                        <span className="font-bold text-slate-300">{t.plotArmorTitle}</span>
+                        <span className={plotArmorActive ? 'text-emerald-400' : 'text-slate-500'}>
+                          {plotArmorActive ? t.plotArmorActive : t.plotArmorExhausted}
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Tactical Tools & D20 Fate Die */}
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+                  {/* First Aid Ability */}
+                  <button
+                    onClick={useFirstAid}
+                    disabled={healCooldown > 0 || health >= maxHealth}
+                    className={`p-3 rounded-xl border flex items-center justify-between text-xs transition-all ${
+                      healCooldown === 0 && health < maxHealth
+                        ? 'border-emerald-600/50 bg-emerald-950/20 hover:bg-emerald-950/40 text-emerald-300 cursor-pointer'
+                        : 'border-slate-800 bg-slate-900/40 text-slate-600 cursor-not-allowed'
+                    }`}
+                  >
+                    <div className="flex items-center gap-2">
+                      <span className="text-base">🩹</span>
+                      <div className="text-right">
+                        <p className="font-bold">{isAr ? 'إسعاف طوارئ ميداني (+25 صحة)' : 'Field First Aid (+25 HP)'}</p>
+                        <p className="text-[10px] text-slate-500">{healCooldown > 0 ? `${healCooldown} فصول انتظار` : t.abilityReady}</p>
+                      </div>
+                    </div>
+                    <span className="font-mono text-emerald-400 font-bold">⚡</span>
+                  </button>
+
+                  {/* Smoke Screen Ability */}
+                  <button
+                    onClick={useSmokeScreen}
+                    disabled={smokeCooldown > 0}
+                    className={`p-3 rounded-xl border flex items-center justify-between text-xs transition-all ${
+                      smokeCooldown === 0
+                        ? 'border-indigo-600/50 bg-indigo-950/20 hover:bg-indigo-950/40 text-indigo-300 cursor-pointer'
+                        : 'border-slate-800 bg-slate-900/40 text-slate-600 cursor-not-allowed'
+                    }`}
+                  >
+                    <div className="flex items-center gap-2">
+                      <span className="text-base">💨</span>
+                      <div className="text-right">
+                        <p className="font-bold">{isAr ? 'قنبلة دخان تكتيكية (رفع الحظ لـ 18)' : 'Tactical Smoke Screen (D20 = 18)'}</p>
+                        <p className="text-[10px] text-slate-500">{smokeCooldown > 0 ? `${smokeCooldown} فصول انتظار` : t.abilityReady}</p>
+                      </div>
+                    </div>
+                    <span className="font-mono text-indigo-400 font-bold">⚡</span>
+                  </button>
+
+                  {/* D20 Fate Die */}
+                  <button
+                    onClick={rollDice}
+                    disabled={isRollingDice}
+                    className="p-3 rounded-xl border border-amber-600/50 bg-amber-950/20 hover:bg-amber-950/40 text-amber-300 flex items-center justify-between text-xs transition-all cursor-pointer"
+                  >
+                    <div className="flex items-center gap-2">
+                      <span className={`text-base ${isRollingDice ? 'animate-spin' : ''}`}>🎲</span>
+                      <div className="text-right">
+                        <p className="font-bold">{t.diceRollTitle}</p>
+                        <p className="text-[10px] text-amber-400/70">{isAr ? 'عزز نتيجة قرارك القادم' : 'Boost your next decision'}</p>
+                      </div>
+                    </div>
+                    <span className="font-mono font-black text-sm px-2 py-0.5 rounded bg-amber-900/60 text-amber-200">
+                      {lastD20Roll ? `D20: ${lastD20Roll}` : t.btnRollDice}
+                    </span>
+                  </button>
+                </div>
+
+                {/* Story Chapters Feed */}
+                <div className="space-y-6">
+                  {storyTurns.map((turn, idx) => (
+                    <article
+                      key={idx}
+                      className="rounded-2xl border border-slate-800 bg-slate-900/90 p-5 md:p-7 shadow-xl space-y-4"
+                    >
+                      <div className="flex items-center justify-between border-b border-slate-800 pb-3">
+                        <div className="flex items-center gap-2">
+                          <span className="flex h-7 w-7 items-center justify-center rounded-lg bg-rose-600/20 text-rose-400 font-bold text-xs border border-rose-600/30">
+                            {turn.turnNumber}
+                          </span>
+                          <h3 className="text-base md:text-lg font-black text-white">{turn.title}</h3>
+                        </div>
+
+                        <div className="flex items-center gap-2">
+                          {turn.detectedIntent && (
+                            <span className="text-[11px] font-bold px-2 py-0.5 rounded-full bg-slate-800 text-slate-300 border border-slate-700">
+                              {t[`intent_${turn.detectedIntent}`] || turn.detectedIntent}
+                            </span>
+                          )}
+                          {turn.healthChange !== undefined && turn.healthChange !== 0 && (
+                            <span className={`text-xs font-bold px-2 py-1 rounded-md ${turn.healthChange > 0 ? 'bg-emerald-950 text-emerald-400 border border-emerald-800' : 'bg-rose-950 text-rose-400 border border-rose-800'}`}>
+                              {turn.healthChange > 0 ? `+${turn.healthChange} HP` : `${turn.healthChange} HP`}
+                            </span>
+                          )}
+                        </div>
+                      </div>
+
+                      {/* Scene narrative text */}
+                      <p className="text-sm md:text-base leading-relaxed text-slate-200 whitespace-pre-line font-medium">
+                        {turn.scene}
+                      </p>
+
+                      {/* Side Character Impact Cards */}
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-3 pt-2 text-xs">
+                        <div className="p-3 rounded-xl border border-sky-900/40 bg-sky-950/20 text-sky-200">
+                          <span className="font-bold block text-sky-400 mb-1">{t.canonHeroLabel}</span>
+                          {turn.canonHeroEvent}
+                        </div>
+                        <div className="p-3 rounded-xl border border-indigo-900/40 bg-indigo-950/20 text-indigo-200">
+                          <span className="font-bold block text-indigo-400 mb-1">{t.consequenceLabel}</span>
+                          {turn.consequence}
+                        </div>
+                      </div>
+
+                      {/* Previous player decision badge */}
+                      {turn.playerDecision && idx > 0 && (
+                        <div className="text-xs text-slate-400 border-t border-slate-800/80 pt-2 flex items-center gap-1.5 font-mono">
+                          <span className="text-rose-400">✍️ {isAr ? 'قرارك المكتوب:' : 'Your action:'}</span>
+                          <span className="italic text-slate-300">"{turn.playerDecision}"</span>
+                        </div>
+                      )}
+                    </article>
+                  ))}
+                </div>
+
+                {/* THE FREE-FORM WRITING CONSOLE (إلغاء أزرار الخيارات تماماً + محرك محلي) */}
+                <div className="sticky bottom-4 rounded-2xl border-2 border-rose-600/50 bg-slate-900/95 p-4 md:p-6 shadow-2xl backdrop-blur-md flex flex-col gap-3">
+                  <div className="flex items-center justify-between">
+                    <label className="text-xs md:text-sm font-black text-rose-300 flex items-center gap-2">
+                      <span>✍️</span> {t.freeFormHeading}
+                    </label>
+                    <div className="flex items-center gap-3">
+                      {liveIntent && (
+                        <span className="text-xs font-bold text-amber-400 flex items-center gap-1 bg-amber-950/40 border border-amber-800/50 px-2 py-0.5 rounded-lg">
+                          <span>{t.detectedIntent}</span>
+                          <span>{t[`intent_${liveIntent}`] || liveIntent}</span>
+                        </span>
+                      )}
+                      <span className="text-[11px] text-slate-400 font-mono">
+                        {playerInput.length} {t.freeFormCharCount}
+                      </span>
+                    </div>
+                  </div>
+
+                  {/* Suggestion Chips */}
+                  <div className="flex items-center gap-2 overflow-x-auto pb-1 text-xs text-slate-400">
+                    <span className="shrink-0 text-[11px] font-semibold text-slate-500">{t.suggestionPrompt}</span>
+                    <button
+                      onClick={() => setPlayerInput(t.sug1)}
+                      className="shrink-0 px-2.5 py-1 rounded-lg border border-slate-700 bg-slate-800 hover:border-rose-500 text-slate-300 transition-colors"
+                    >
+                      + {t.sug1}
+                    </button>
+                    <button
+                      onClick={() => setPlayerInput(t.sug2)}
+                      className="shrink-0 px-2.5 py-1 rounded-lg border border-slate-700 bg-slate-800 hover:border-rose-500 text-slate-300 transition-colors"
+                    >
+                      + {t.sug2}
+                    </button>
+                    <button
+                      onClick={() => setPlayerInput(t.sug3)}
+                      className="shrink-0 px-2.5 py-1 rounded-lg border border-slate-700 bg-slate-800 hover:border-rose-500 text-slate-300 transition-colors"
+                    >
+                      + {t.sug3}
+                    </button>
+                    <button
+                      onClick={() => setPlayerInput(t.sug4)}
+                      className="shrink-0 px-2.5 py-1 rounded-lg border border-slate-700 bg-slate-800 hover:border-rose-500 text-slate-300 transition-colors"
+                    >
+                      + {t.sug4}
+                    </button>
+                    <button
+                      onClick={() => setPlayerInput(t.sug5)}
+                      className="shrink-0 px-2.5 py-1 rounded-lg border border-slate-700 bg-slate-800 hover:border-rose-500 text-slate-300 transition-colors"
+                    >
+                      + {t.sug5}
+                    </button>
+                  </div>
+
+                  {/* Textarea */}
+                  <textarea
+                    rows="3"
+                    value={playerInput}
+                    onChange={e => setPlayerInput(e.target.value)}
+                    placeholder={t.freeFormPlaceholder}
+                    disabled={isAnalyzing}
+                    className="w-full rounded-xl border border-slate-700 bg-slate-950 p-3.5 text-sm md:text-base text-white placeholder-slate-500 focus:border-rose-500 focus:ring-1 focus:ring-rose-500 focus:outline-none resize-none leading-relaxed"
+                  />
+
+                  {/* Submit Button */}
+                  <button
+                    onClick={handleSubmitDecision}
+                    disabled={!playerInput.trim() || isAnalyzing}
+                    className={`w-full py-3.5 rounded-xl font-black text-sm md:text-base flex items-center justify-center gap-2 transition-all shadow-lg ${
+                      !playerInput.trim() || isAnalyzing
+                        ? 'bg-slate-800 text-slate-500 cursor-not-allowed border border-slate-700'
+                        : 'bg-gradient-to-r from-rose-600 via-rose-500 to-indigo-600 hover:from-rose-500 hover:to-indigo-500 text-white shadow-rose-600/30 hover:scale-[1.01] cursor-pointer'
+                    }`}
+                  >
+                    {isAnalyzing ? (
+                      <>
+                        <span className="h-4 w-4 rounded-full border-2 border-white/30 border-t-white animate-spin"></span>
+                        <span>{t.analyzingInput}</span>
+                      </>
+                    ) : (
+                      <span>{t.btnSubmitDecision}</span>
+                    )}
+                  </button>
+                </div>
+
+              </div>
+            )}
+
+            {/* BOTTOM AD BANNER PLACEHOLDER (AdSense Responsive 728x90) */}
+            <div 
+              id="ad-slot-footer"
+              className="w-full min-h-[70px] md:min-h-[90px] border border-dashed border-slate-800 bg-slate-900/40 rounded-xl flex flex-col items-center justify-center text-center p-3 relative overflow-hidden group hover:border-slate-700 transition-colors"
+            >
+              <div className="absolute top-1.5 right-2 text-[10px] uppercase font-mono tracking-wider text-slate-500 bg-slate-950/80 px-2 py-0.5 rounded border border-slate-800">
+                {t.adNotice}
+              </div>
+              <span className="text-xs md:text-sm font-semibold text-slate-400 group-hover:text-slate-300">
+                {t.adPlaceholderFooter}
+              </span>
+              <span className="text-[10px] text-slate-500 font-mono mt-0.5">
+                Target Ad Placement Unit • Compliant with Google Publisher Policies
+              </span>
+            </div>
+
+          </main>
+
+          {/* Footer with Compliance & Policy Links */}
+          <footer className="border-t border-slate-800 bg-slate-950 px-4 py-6 mt-8">
+            <div className="max-w-6xl mx-auto flex flex-col md:flex-row items-center justify-between gap-4 text-xs text-slate-500">
+              <div className="flex items-center gap-4 font-semibold">
+                <button
+                  onClick={() => setShowPrivacyModal(true)}
+                  className="hover:text-rose-400 underline decoration-slate-700 hover:decoration-rose-400 transition-colors"
+                >
+                  {t.footerPrivacy}
+                </button>
+                <span>•</span>
+                <button
+                  onClick={() => setShowTermsModal(true)}
+                  className="hover:text-rose-400 underline decoration-slate-700 hover:decoration-rose-400 transition-colors"
+                >
+                  {t.footerTerms}
+                </button>
+                <span>•</span>
+                <button
+                  onClick={() => setShowContactModal(true)}
+                  className="hover:text-rose-400 underline decoration-slate-700 hover:decoration-rose-400 transition-colors"
+                >
+                  {t.footerContact}
+                </button>
+              </div>
+
+              <div className="text-center md:text-left text-slate-500">
+                {t.footerCopyright}
+              </div>
+            </div>
+          </footer>
+
+          {/* COOKIE CONSENT BANNER */}
+          {!cookieAccepted && (
+            <div className="fixed bottom-0 inset-x-0 z-50 p-3 md:p-4 bg-slate-900/95 border-t border-slate-700 backdrop-blur-md shadow-2xl">
+              <div className="max-w-6xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-3 text-xs md:text-sm">
+                <div className="flex items-center gap-2 text-slate-300 text-center sm:text-right">
+                  <span className="text-lg">🍪</span>
+                  <span>
+                    {t.cookieText}{' '}
+                    <button
+                      onClick={() => setShowPrivacyModal(true)}
+                      className="text-rose-400 hover:underline font-semibold"
+                    >
+                      [{t.cookieLearnMore}]
+                    </button>
+                  </span>
+                </div>
+                <button
+                  onClick={handleAcceptCookies}
+                  className="shrink-0 px-5 py-2 rounded-xl bg-gradient-to-r from-rose-600 to-indigo-600 hover:from-rose-500 hover:to-indigo-500 text-white font-bold text-xs shadow-md transition-all hover:scale-[1.02]"
+                >
+                  {t.cookieAccept}
+                </button>
+              </div>
+            </div>
+          )}
+
+          {/* PRIVACY POLICY MODAL */}
+          {showPrivacyModal && (
+            <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm p-4">
+              <div className="w-full max-w-2xl max-h-[85vh] flex flex-col rounded-2xl border border-slate-700 bg-slate-900 shadow-2xl">
+                <div className="p-4 md:p-5 border-b border-slate-800 flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <span className="text-xl">📜</span>
+                    <h3 className="font-bold text-base md:text-lg text-white">
+                      {isAr ? 'سياسة الخصوصية ومعايير الامتثال الإعلاني' : 'Privacy Policy & Ad Compliance'}
+                    </h3>
+                  </div>
+                  <button
+                    onClick={() => setShowPrivacyModal(false)}
+                    className="h-8 w-8 rounded-lg bg-slate-800 text-slate-400 hover:text-white flex items-center justify-center font-bold text-sm"
+                  >
+                    ✕
+                  </button>
+                </div>
+
+                <div className="p-5 md:p-6 overflow-y-auto space-y-4 text-xs md:text-sm text-slate-300 leading-relaxed">
+                  {isAr ? (
+                    <>
+                      <h4 className="font-bold text-rose-400 text-base">1. التزام الخصوصية العام</h4>
+                      <p>
+                        نحن نقدر خصوصيتك التامة. تم تصميم تطبيق لعبة "سجلات الشخصية الجانبية" ليعمل بآلية محلية تحافظ على بيانات المستخدم. لا نقوم ببيع أو مشاركة أي بيانات شخصية حساسة للمستخدمين مع أطراف خارجية.
+                      </p>
+
+                      <h4 className="font-bold text-rose-400 text-base">2. التخزين المحلي (Local Storage)</h4>
+                      <p>
+                        يستخدم التطبيق مساحة التخزين المحلي في متصفحك (HTML5 Local Storage) فقط لحفظ تقدم قصة اللعبة وحالة الشخصية ونقاط الخبرة وتفضيلات اللغة، ولا يتم إرسال هذه البيانات إلى أي خوادم خارجية.
+                      </p>
+
+                      <h4 className="font-bold text-rose-400 text-base">3. ملفات تعريف الارتباط وإعلانات Google AdSense</h4>
+                      <p>
+                        قد يستخدم هذا الموقع خدمات إعلانية تابعة لجهات خارجية مثل Google AdSense لتقديم إعلانات عند زيارتك لموقعنا. قد تستخدم هذه الشركات ملفات تعريف الارتباط (مثل ملف تعريف الارتباط DoubleClick DART) لعرض إعلانات مخصصة استناداً إلى زياراتك السابقة لهذا الموقع أو لمواقع أخرى على الإنترنت.
+                      </p>
+                      <p>
+                        يمكن للمستخدمين إلغاء الاشتراك في استخدام ملف تعريف الارتباط المخصص للإعلانات المستندة إلى الاهتمامات عبر زيارة: <a href="https://adssettings.google.com" target="_blank" rel="noreferrer" className="text-indigo-400 underline">إعدادات إعلانات Google</a>.
+                      </p>
+
+                      <h4 className="font-bold text-rose-400 text-base">4. الامتثال لقوانين GDPR و CCPA</h4>
+                      <p>
+                        يحق لمستخدمي الاتحاد الأوروبي وكاليفورنيا طلب مسح أي بيانات مخزنة محلياً بضغطة زر واحدة عبر خيار "مغامرة جديدة"، والذي يقوم بحذف كامل التخزين المحلي فورياً من جهازك.
+                      </p>
+
+                      <h4 className="font-bold text-rose-400 text-base">5. التعديلات والتواصل</h4>
+                      <p>
+                        نحتفظ بالحق في تعديل سياسة الخصوصية هذه لمواكبة تحديثات سياسات منصات الإعلانات أو الأنظمة المعمول بها.
+                      </p>
+                    </>
+                  ) : (
+                    <>
+                      <h4 className="font-bold text-rose-400 text-base">1. Privacy Overview</h4>
+                      <p>
+                        We respect your personal privacy. "Side Character Chronicles" operates as an offline narrative engine. We never sell, rent, or trade your personal information.
+                      </p>
+
+                      <h4 className="font-bold text-rose-400 text-base">2. Browser Local Storage</h4>
+                      <p>
+                        Game progression, character attributes, and language preferences are stored strictly on your device using HTML5 Local Storage. No personal gameplay records are harvested or uploaded to external servers.
+                      </p>
+
+                      <h4 className="font-bold text-rose-400 text-base">3. Cookies & Google AdSense Compliance</h4>
+                      <p>
+                        This website may utilize third-party ad networks including Google AdSense. Third-party vendors, including Google, use cookies to serve ads based on prior visits to this website or other sites.
+                      </p>
+                      <p>
+                        You can opt out of personalized advertising by visiting <a href="https://adssettings.google.com" target="_blank" rel="noreferrer" className="text-indigo-400 underline">Google Ads Settings</a>.
+                      </p>
+
+                      <h4 className="font-bold text-rose-400 text-base">4. GDPR & CCPA Rights</h4>
+                      <p>
+                        You hold the full right to delete your stored game sessions instantly by clicking the "New Game" button, completely clearing your local browser storage.
+                      </p>
+                    </>
+                  )}
+                </div>
+
+                <div className="p-4 border-t border-slate-800 flex justify-end">
+                  <button
+                    onClick={() => setShowPrivacyModal(false)}
+                    className="px-4 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-bold transition-colors"
+                  >
+                    {isAr ? 'إغلاق' : 'Close'}
+                  </button>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* TERMS OF SERVICE MODAL */}
+          {showTermsModal && (
+            <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm p-4">
+              <div className="w-full max-w-xl max-h-[85vh] flex flex-col rounded-2xl border border-slate-700 bg-slate-900 shadow-2xl">
+                <div className="p-4 md:p-5 border-b border-slate-800 flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <span className="text-xl">⚖️</span>
+                    <h3 className="font-bold text-base md:text-lg text-white">
+                      {isAr ? 'شروط الخدمة والاستخدام' : 'Terms of Service'}
+                    </h3>
+                  </div>
+                  <button
+                    onClick={() => setShowTermsModal(false)}
+                    className="h-8 w-8 rounded-lg bg-slate-800 text-slate-400 hover:text-white flex items-center justify-center font-bold text-sm"
+                  >
+                    ✕
+                  </button>
+                </div>
+
+                <div className="p-5 md:p-6 overflow-y-auto space-y-3 text-xs md:text-sm text-slate-300 leading-relaxed">
+                  <p>
+                    {isAr 
+                      ? 'مرحباً بك في لعبة سجلات الشخصية الجانبية. باستخدامك لهذا التطبيق، فإنك توافق على الالتزام بشروط الاستخدام المعمول بها.' 
+                      : 'Welcome to Side Character Chronicles. By accessing this web app, you agree to comply with our Terms of Service.'}
+                  </p>
+                  <ul className="list-disc list-inside space-y-1.5 text-slate-400">
+                    <li>{isAr ? 'هذا العمل لعبة خيالية وتفاعلية مخصصة للترفيه والإبداع القصصي.' : 'This work is a fictional interactive entertainment application.'}</li>
+                    <li>{isAr ? 'لا يسمح باستغلال المحرك في بث محتوى مسيء أو ضار.' : 'Users agree not to input malicious, unlawful, or abusive content.'}</li>
+                    <li>{isAr ? 'جميع عوالم وأسماء الأنمي مستوحاة ومحمية بحقوق مؤلفيها الأصليين (Fair Use / Parody).' : 'Anime universe lore and canon hero mentions are inspired works under Fair Use.'}</li>
+                  </ul>
+                </div>
+
+                <div className="p-4 border-t border-slate-800 flex justify-end">
+                  <button
+                    onClick={() => setShowTermsModal(false)}
+                    className="px-4 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-bold transition-colors"
+                  >
+                    {isAr ? 'إغلاق' : 'Close'}
+                  </button>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* CONTACT MODAL */}
+          {showContactModal && (
+            <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm p-4">
+              <div className="w-full max-w-md flex flex-col rounded-2xl border border-slate-700 bg-slate-900 shadow-2xl p-6 text-center">
+                <div className="mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-xl bg-rose-600/20 text-rose-400 text-2xl border border-rose-600/30">
+                  ✉️
+                </div>
+                <h3 className="font-bold text-lg text-white mb-1">
+                  {isAr ? 'تواصل معنا' : 'Contact Support & Inquiries'}
+                </h3>
+                <p className="text-xs text-slate-400 mb-4">
+                  {isAr 
+                    ? 'لأي استفسارات إعلانية، شراكات، أو ملاحظات بخصوص سياسة الخصوصية:' 
+                    : 'For advertising inquiries, partnership proposals, or privacy questions:'}
+                </p>
+
+                <div className="p-3 rounded-xl bg-slate-950 border border-slate-800 font-mono text-xs text-rose-300 mb-5 select-all">
+                  support@sidecharacter-rpg.com
+                </div>
+
+                <button
+                  onClick={() => setShowContactModal(false)}
+                  className="w-full py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-white font-bold text-xs transition-colors"
+                >
+                  {isAr ? 'حسناً' : 'Done'}
+                </button>
+              </div>
+            </div>
+          )}
+
+        </div>
+      );
+    }
+
+    ReactDOM.createRoot(document.getElementById('root')).render(<App />);
+  </script>
+</body>
+</html>
